@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  # PocketBase - Local development database
+  pocketbase:
+    image: ghcr.io/pocketbase/pocketbase:latest
+    container_name: falcon-core-pocketbase
+    ports:
+      - "8090:8090"
+    volumes:
+      - ./pocketbase_data:/pb_data
+      - ./pocketbase_backup:/pb_backup
+    environment:
+      - PB_ENCRYPTION_KEY=${PB_ENCRYPTION_KEY:-}
+      - PB_ADMIN_EMAIL=${PB_ADMIN_EMAIL:-admin@example.com}
+      - PB_ADMIN_PASSWORD=${PB_ADMIN_PASSWORD:-admin123456}
+    command: /usr/local/bin/pocketbase serve --http=0.0.0.0:8090
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8090/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - falcon-core
+
+  # PostgreSQL - Optional, for production use
+  # postgres:
+  #   image: postgres:16-alpine
+  #   container_name: falcon-core-postgres
+  #   ports:
+  #     - "5432:5432"
+  #   environment:
+  #     POSTGRES_DB: falcon_core
+  #     POSTGRES_USER: falcon
+  #     POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pg_isready -U falcon"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+  #   restart: unless-stopped
+  #   networks:
+  #     - falcon-core
+
+networks:
+  falcon-core:
+    driver: bridge
+
+volumes:
+  pocketbase_data:
+  pocketbase_backup:
+  # postgres_data:
