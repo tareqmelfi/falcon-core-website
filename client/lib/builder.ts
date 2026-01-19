@@ -194,6 +194,11 @@ async function fetchBuilderArticles(filters: {
           return false;
         }
 
+        // Apply slug filter if provided (for getArticleBySlug)
+        if (filters.slug && slug !== filters.slug) {
+          return false;
+        }
+
         // Apply status filter if provided
         if (filters.status && status !== filters.status) {
           return false;
