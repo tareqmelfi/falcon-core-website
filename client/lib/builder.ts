@@ -304,14 +304,29 @@ export async function getArticles(category?: string, limit = 50): Promise<Articl
  * Get a single article by slug
  */
 export async function getArticleBySlug(slug: string): Promise<Article | null> {
+  console.log('🔍 getArticleBySlug called with slug:', slug);
+
+  // Fetch all published articles and filter by slug
+  // This is more reliable than using limit:1 which may not return the right article
   const articles = await fetchBuilderArticles({
     model: 'article',
-    slug,
     status: 'published',
-    limit: 1,
+    limit: 100,
   });
 
-  return articles.length > 0 ? articles[0] : null;
+  console.log('🔍 Total articles fetched:', articles.length);
+
+  // Find the article with matching slug
+  const article = articles.find(a => a.slug === slug);
+
+  if (article) {
+    console.log('✅ Found article:', article.title);
+  } else {
+    console.warn('❌ Article not found with slug:', slug);
+    console.log('Available slugs:', articles.map(a => a.slug).join(', '));
+  }
+
+  return article || null;
 }
 
 /**
