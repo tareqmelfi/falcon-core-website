@@ -7,6 +7,18 @@ import { ArrowRight, Search } from 'lucide-react';
 import { getArticles, Article } from '@/lib/builder';
 import { toast } from 'sonner';
 
+// Helper function to detect Arabic content in text
+function hasArabicText(text: string): boolean {
+  if (!text) return false;
+  const arabicPattern = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]/;
+  return arabicPattern.test(text);
+}
+
+// Determine if an article is Arabic based on title and category
+function isArabicArticle(article: Article): boolean {
+  return hasArabicText(article.title) || hasArabicText(article.category);
+}
+
 const Articles = () => {
   const { t, language } = useLanguage();
   const [articles, setArticles] = useState<Article[]>([]);
@@ -19,14 +31,24 @@ const Articles = () => {
     const fetchArticles = async () => {
       try {
         setIsLoading(true);
-        console.log('📄 Articles component: Fetching articles for category:', selectedCategory);
+        console.log('📄 Articles: Fetching for category:', selectedCategory, 'language:', language);
         const data = await getArticles(
           selectedCategory === 'all' ? undefined : selectedCategory
         );
 
-        // Show all articles regardless of language
-        console.log('📄 Articles component: Received', data.length, 'articles');
-        setArticles(data);
+        // Filter articles based on current language
+        // Arabic articles show when site is Arabic, English articles when site is English
+        const filteredByLanguage = data.filter(article => {
+          const articleIsArabic = isArabicArticle(article);
+          if (language === 'ar') {
+            return articleIsArabic; // Show Arabic articles when site is Arabic
+          } else {
+            return !articleIsArabic; // Show English articles when site is English
+          }
+        });
+
+        console.log('📄 Articles: Total', data.length, '→ Filtered for', language + ':', filteredByLanguage.length);
+        setArticles(filteredByLanguage);
       } catch (error) {
         console.error('Error loading articles:', error);
         toast.error('Failed to load articles');
@@ -36,7 +58,7 @@ const Articles = () => {
     };
 
     fetchArticles();
-  }, [selectedCategory]);
+  }, [selectedCategory, language]);
 
   // Get unique categories from articles
   const categories = ['all', ...Array.from(new Set(articles.map(article => article.category)))];
