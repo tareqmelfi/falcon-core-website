@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useParams, Link } from 'react-router-dom';
 import { useLanguage } from '@/lib/i18n';
 import Layout from '@/components/layout/Layout';
-import { ChevronLeft, ArrowRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ArrowRight, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ArticleHeroSection } from '@/components/ui/ArticleHeroSection';
 import { ArticleMetadata } from '@/components/ui/ArticleMetadata';
@@ -12,6 +12,12 @@ import { getArticleBySlug, getRelatedArticles, Article } from '@/lib/builder';
 import { useArticleMetaTags } from '@/hooks/useMetaTags';
 import { toast } from 'sonner';
 
+// Helper function to detect Arabic content
+function detectArabicContent(text: string): boolean {
+  const arabicPattern = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]/;
+  return arabicPattern.test(text);
+}
+
 const ArticleDetail = () => {
   const { slug } = useParams<{ slug: string }>();
   const { t, dir } = useLanguage();
@@ -19,6 +25,12 @@ const ArticleDetail = () => {
   const [relatedArticles, setRelatedArticles] = useState<Article[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [readingProgress, setReadingProgress] = useState(0);
+
+  // Auto-detect if article is Arabic
+  const isArabicArticle = useMemo(() => {
+    if (!article) return false;
+    return detectArabicContent(article.title) || detectArabicContent(article.content);
+  }, [article]);
 
   // Set meta tags when article loads
   useArticleMetaTags(
@@ -134,11 +146,20 @@ const ArticleDetail = () => {
 
       {/* Back Button - Sticky Header */}
       <div className="sticky top-20 z-40 bg-background/80 backdrop-blur-md border-b border-white/10">
-        <div className="container mx-auto px-4 py-4">
+        <div className={`container mx-auto px-4 py-4 ${isArabicArticle ? 'text-right' : 'text-left'}`} dir={isArabicArticle ? 'rtl' : 'ltr'}>
           <Link to="/articles">
-            <Button variant="ghost" className="rounded-full hover:bg-white/10">
-              <ChevronLeft className={`w-4 h-4 ${dir === 'rtl' ? 'ml-2' : 'mr-2'}`} />
-              {t('articles.back') || 'Back to Articles'}
+            <Button variant="ghost" className="rounded-full hover:bg-white/10" style={{ fontFamily: isArabicArticle ? "'Noto Sans Arabic', sans-serif" : "'Inter', sans-serif" }}>
+              {isArabicArticle ? (
+                <>
+                  {t('articles.back') || 'العودة للمقالات'}
+                  <ChevronRight className="w-4 h-4 mr-2" />
+                </>
+              ) : (
+                <>
+                  <ChevronLeft className="w-4 h-4 mr-2" />
+                  {t('articles.back') || 'Back to Articles'}
+                </>
+              )}
             </Button>
           </Link>
         </div>
@@ -174,7 +195,7 @@ const ArticleDetail = () => {
 
       {/* Related Articles Section */}
       {relatedArticles.length > 0 && (
-        <section className="py-20 border-t border-black/10">
+        <section className="py-20 border-t border-black/10" dir={isArabicArticle ? 'rtl' : 'ltr'}>
           <div className="container mx-auto px-4">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -183,12 +204,18 @@ const ArticleDetail = () => {
               transition={{ duration: 0.6 }}
               className="max-w-4xl mx-auto"
             >
-              <h2 className="text-3xl md:text-4xl font-bold mb-12">Related Articles</h2>
+              <h2
+                className="text-3xl md:text-4xl font-bold mb-12"
+                style={{ fontFamily: isArabicArticle ? "'Rubik', 'Noto Sans Arabic', sans-serif" : "'Rubik', sans-serif" }}
+              >
+                {isArabicArticle ? 'مقالات ذات صلة' : 'Related Articles'}
+              </h2>
 
               <div className="grid md:grid-cols-3 gap-6">
                 {relatedArticles.map((relatedArticle, index) => {
                   // Strip fc.sa/ prefix from slug for URL
                   const relatedUrlSlug = relatedArticle.slug.replace(/^fc\.sa\//, '');
+                  const isRelatedArabic = detectArabicContent(relatedArticle.title);
                   return (
                   <motion.div
                     key={relatedArticle.id}
@@ -197,6 +224,7 @@ const ArticleDetail = () => {
                     viewport={{ once: true }}
                     transition={{ duration: 0.6, delay: index * 0.1 }}
                     className="group"
+                    dir={isRelatedArabic ? 'rtl' : 'ltr'}
                   >
                     <Link to={`/articles/${relatedUrlSlug}`}>
                       <div className="h-48 rounded-lg overflow-hidden mb-4 bg-gradient-to-br from-primary/10 to-primary/5">
@@ -209,31 +237,44 @@ const ArticleDetail = () => {
 
                       <div className="space-y-2">
                         <div className="flex items-center gap-2 text-sm">
-                          <span className="px-2 py-1 rounded-full bg-white/10 text-blue-400 text-xs font-semibold">
+                          <span
+                            className="px-2 py-1 rounded-full bg-white/10 text-blue-400 text-xs font-semibold"
+                            style={{ fontFamily: isRelatedArabic ? "'Noto Sans Arabic', sans-serif" : "'Inter', sans-serif" }}
+                          >
                             {relatedArticle.category}
                           </span>
                           <span className="text-gray-400 text-xs">
-                            {relatedArticle.readTime} min read
+                            {relatedArticle.readTime} {isRelatedArabic ? 'دقائق قراءة' : 'min read'}
                           </span>
                         </div>
 
-                        <h3 className="text-lg font-semibold text-white group-hover:text-blue-400 transition-colors line-clamp-2">
+                        <h3
+                          className="text-lg font-semibold text-white group-hover:text-blue-400 transition-colors line-clamp-2"
+                          style={{ fontFamily: isRelatedArabic ? "'Rubik', 'Noto Sans Arabic', sans-serif" : "'Rubik', sans-serif" }}
+                        >
                           {relatedArticle.title}
                         </h3>
 
-                        <p className="text-sm text-gray-400 line-clamp-2">
+                        <p
+                          className="text-sm text-gray-400 line-clamp-2"
+                          style={{ fontFamily: isRelatedArabic ? "'Noto Sans Arabic', sans-serif" : "'Inter', sans-serif" }}
+                        >
                           {relatedArticle.excerpt}
                         </p>
 
                         <div className="flex items-center justify-between pt-2">
                           <span className="text-xs text-gray-500">
-                            {new Date(relatedArticle.date).toLocaleDateString('en-US', {
+                            {new Date(relatedArticle.date).toLocaleDateString(isRelatedArabic ? 'ar-SA' : 'en-US', {
                               month: 'short',
                               day: 'numeric',
                               year: 'numeric',
                             })}
                           </span>
-                          <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-blue-400 group-hover:translate-x-1 transition-all" />
+                          {isRelatedArabic ? (
+                            <ArrowLeft className="w-4 h-4 text-gray-400 group-hover:text-blue-400 group-hover:-translate-x-1 transition-all" />
+                          ) : (
+                            <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-blue-400 group-hover:translate-x-1 transition-all" />
+                          )}
                         </div>
                       </div>
                     </Link>
@@ -247,7 +288,7 @@ const ArticleDetail = () => {
       )}
 
       {/* CTA Section */}
-      <section className="py-20 border-t border-black/10">
+      <section className="py-20 border-t border-black/10" dir={isArabicArticle ? 'rtl' : 'ltr'}>
         <div className="container mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -256,16 +297,32 @@ const ArticleDetail = () => {
             transition={{ duration: 0.6 }}
             className="max-w-2xl mx-auto text-center"
           >
-            <h2 className="text-3xl md:text-4xl font-bold mb-6">
-              Discover More Articles
+            <h2
+              className="text-3xl md:text-4xl font-bold mb-6"
+              style={{ fontFamily: isArabicArticle ? "'Rubik', 'Noto Sans Arabic', sans-serif" : "'Rubik', sans-serif" }}
+            >
+              {isArabicArticle ? 'اكتشف المزيد من المقالات' : 'Discover More Articles'}
             </h2>
-            <p className="text-muted-foreground mb-8 text-lg">
-              Explore our collection of technical articles and industry insights.
+            <p
+              className="text-muted-foreground mb-8 text-lg"
+              style={{ fontFamily: isArabicArticle ? "'Noto Sans Arabic', sans-serif" : "'Inter', sans-serif" }}
+            >
+              {isArabicArticle
+                ? 'استكشف مجموعتنا من المقالات التقنية والرؤى الصناعية.'
+                : 'Explore our collection of technical articles and industry insights.'}
             </p>
             <Link to="/articles">
-              <Button size="lg" className="rounded-full bg-blue-600 hover:bg-blue-700">
-                Browse All Articles
-                <ArrowRight className="w-4 h-4 ml-2" />
+              <Button
+                size="lg"
+                className="rounded-full bg-blue-600 hover:bg-blue-700"
+                style={{ fontFamily: isArabicArticle ? "'Noto Sans Arabic', sans-serif" : "'Inter', sans-serif" }}
+              >
+                {isArabicArticle ? 'تصفح جميع المقالات' : 'Browse All Articles'}
+                {isArabicArticle ? (
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                ) : (
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                )}
               </Button>
             </Link>
           </motion.div>

@@ -1,20 +1,40 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
 
 interface ArticleContentProps {
   content: string;
+  isArabic?: boolean;
 }
 
-export function ArticleContent({ content }: ArticleContentProps) {
+// Helper function to detect Arabic content
+function detectArabicContent(text: string): boolean {
+  const arabicPattern = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]/;
+  return arabicPattern.test(text);
+}
+
+export function ArticleContent({ content, isArabic: forcedArabic }: ArticleContentProps) {
+  // Auto-detect Arabic if not explicitly set
+  const isArabic = useMemo(() => {
+    if (forcedArabic !== undefined) return forcedArabic;
+    return detectArabicContent(content);
+  }, [content, forcedArabic]);
+
   return (
     <motion.article
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
-      className="prose prose-invert max-w-none mx-auto px-4 md:px-0"
+      className={`prose prose-invert max-w-none mx-auto px-4 md:px-0 ${isArabic ? 'article-arabic' : ''}`}
+      dir={isArabic ? 'rtl' : 'ltr'}
     >
       <style>{`
+        /* Base Article Styles */
+        .article-content {
+          font-family: 'Inter', 'Rubik', sans-serif;
+        }
+
         .article-content h2 {
+          font-family: 'Rubik', sans-serif;
           font-size: 2rem;
           font-weight: 700;
           margin-top: 2.5rem;
@@ -24,6 +44,7 @@ export function ArticleContent({ content }: ArticleContentProps) {
         }
 
         .article-content h3 {
+          font-family: 'Rubik', sans-serif;
           font-size: 1.5rem;
           font-weight: 600;
           margin-top: 2rem;
@@ -32,6 +53,7 @@ export function ArticleContent({ content }: ArticleContentProps) {
         }
 
         .article-content h4 {
+          font-family: 'Rubik', sans-serif;
           font-size: 1.25rem;
           font-weight: 600;
           margin-top: 1.5rem;
@@ -40,8 +62,8 @@ export function ArticleContent({ content }: ArticleContentProps) {
         }
 
         .article-content p {
-          font-size: 1rem;
-          line-height: 1.75;
+          font-size: 1.125rem;
+          line-height: 1.85;
           color: #d1d5db;
           margin-bottom: 1.5rem;
         }
@@ -69,15 +91,15 @@ export function ArticleContent({ content }: ArticleContentProps) {
         }
 
         .article-content ul {
-          list-style-position: inside;
+          list-style-type: disc;
           margin-bottom: 1.5rem;
-          padding-left: 0;
+          padding-left: 1.5rem;
         }
 
         .article-content ul li {
           margin-bottom: 0.75rem;
           color: #d1d5db;
-          line-height: 1.75;
+          line-height: 1.85;
         }
 
         .article-content ul li::marker {
@@ -86,16 +108,15 @@ export function ArticleContent({ content }: ArticleContentProps) {
         }
 
         .article-content ol {
-          list-style-position: inside;
+          list-style-type: decimal;
           margin-bottom: 1.5rem;
-          padding-left: 0;
-          counter-reset: item;
+          padding-left: 1.5rem;
         }
 
         .article-content ol li {
           margin-bottom: 0.75rem;
           color: #d1d5db;
-          line-height: 1.75;
+          line-height: 1.85;
         }
 
         .article-content ol li::marker {
@@ -179,6 +200,38 @@ export function ArticleContent({ content }: ArticleContentProps) {
           border: none;
           border-top: 1px solid #374151;
           margin: 3rem 0;
+        }
+
+        /* Arabic RTL Styles */
+        .article-arabic .article-content {
+          font-family: 'Noto Sans Arabic', sans-serif;
+          direction: rtl;
+          text-align: right;
+        }
+
+        .article-arabic .article-content h2,
+        .article-arabic .article-content h3,
+        .article-arabic .article-content h4 {
+          font-family: 'Rubik', 'Noto Sans Arabic', sans-serif;
+          text-align: right;
+        }
+
+        .article-arabic .article-content ul,
+        .article-arabic .article-content ol {
+          padding-left: 0;
+          padding-right: 1.5rem;
+        }
+
+        .article-arabic .article-content blockquote {
+          border-left: none;
+          border-right: 4px solid #3b82f6;
+          padding-left: 0;
+          padding-right: 1.5rem;
+        }
+
+        .article-arabic .article-content table th,
+        .article-arabic .article-content table td {
+          text-align: right;
         }
       `}</style>
 

@@ -1,6 +1,7 @@
 /** @import must precede all other statements */
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;500;600;700;800&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -71,12 +72,26 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: 'Inter', 'Cairo', sans-serif;
+    font-family: 'Inter', 'Rubik', sans-serif;
   }
 
-  /* RTL Support */
+  /* Headings - Rubik font */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Rubik', 'Inter', sans-serif;
+  }
+
+  /* RTL Support - Arabic */
   [dir="rtl"] body {
-    font-family: 'Cairo', 'Inter', sans-serif;
+    font-family: 'Noto Sans Arabic', 'Rubik', sans-serif;
+  }
+
+  [dir="rtl"] h1,
+  [dir="rtl"] h2,
+  [dir="rtl"] h3,
+  [dir="rtl"] h4,
+  [dir="rtl"] h5,
+  [dir="rtl"] h6 {
+    font-family: 'Rubik', 'Noto Sans Arabic', sans-serif;
   }
 
   :where(p, span, li, h1, h2, h3, h4, h5, h6, a, button, label, td, th) {
@@ -89,4 +104,33 @@
     overflow-x: auto;
     white-space: pre;
   }
+}
+
+/* Arabic Article Content Styles */
+.article-arabic {
+  direction: rtl;
+  text-align: right;
+  font-family: 'Noto Sans Arabic', sans-serif;
+}
+
+.article-arabic h1,
+.article-arabic h2,
+.article-arabic h3,
+.article-arabic h4,
+.article-arabic h5,
+.article-arabic h6 {
+  font-family: 'Rubik', 'Noto Sans Arabic', sans-serif;
+}
+
+.article-arabic ul,
+.article-arabic ol {
+  padding-right: 1.5rem;
+  padding-left: 0;
+}
+
+.article-arabic blockquote {
+  border-right: 4px solid #3b82f6;
+  border-left: none;
+  padding-right: 1.5rem;
+  padding-left: 0;
 }

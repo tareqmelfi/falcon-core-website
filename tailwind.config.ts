@@ -13,6 +13,11 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        sans: ['Inter', 'Rubik', 'sans-serif'],
+        rubik: ['Rubik', 'sans-serif'],
+        arabic: ['Noto Sans Arabic', 'sans-serif'],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
