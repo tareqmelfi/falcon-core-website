@@ -2,7 +2,7 @@ import { Handler } from '@netlify/functions';
 
 // Builder.io API configuration
 const BUILDER_API_KEY = process.env.BUILDER_PRIVATE_KEY || 'bpk-5abb7d3d3b494a5fa7f4b34e3db52f87';
-const BUILDER_PUBLIC_KEY = 'caddb27a75ac426ab2cf2b1bb67636ef';
+const BUILDER_PUBLIC_KEY = process.env.VITE_BUILDER_PUBLIC_KEY || '4a2cb5bf56834399b5a569ae235d6a41';
 
 // Claude API configuration (for translation)
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
