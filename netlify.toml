@@ -14,6 +14,19 @@
   status = 200
   to = "/.netlify/functions/api/:splat"
 
+# Translation functions
+[[redirects]]
+  from = "/api/translate-article"
+  to = "/.netlify/functions/translate-article"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/translate-existing"
+  to = "/.netlify/functions/translate-existing"
+  status = 200
+  force = true
+
 # SPA fallback - must be last
 [[redirects]]
   from = "/*"
