@@ -7,14 +7,8 @@
 [functions]
   external_node_modules = ["express"]
   node_bundler = "esbuild"
-  
-[[redirects]]
-  force = true
-  from = "/api/*"
-  status = 200
-  to = "/.netlify/functions/api/:splat"
 
-# Translation functions
+# Translation functions - MUST be before /api/* catch-all
 [[redirects]]
   from = "/api/translate-article"
   to = "/.netlify/functions/translate-article"
@@ -26,6 +20,13 @@
   to = "/.netlify/functions/translate-existing"
   status = 200
   force = true
+
+# General API catch-all
+[[redirects]]
+  force = true
+  from = "/api/*"
+  status = 200
+  to = "/.netlify/functions/api/:splat"
 
 # SPA fallback - must be last
 [[redirects]]
