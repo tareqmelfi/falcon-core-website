@@ -156,18 +156,24 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
             <div>
               <h4 className="font-bold mb-4">{t('footer.contact_info')}</h4>
               <div className="space-y-2 text-sm text-muted-foreground">
-                <p>Email: info@fc.sa</p>
+                <p>Email: info@fc.sa | info@falconcore.us</p>
                 <p>
                   <a href="tel:8001110110" className="hover:text-primary transition-colors font-semibold text-primary">
-                    📞 {t('contact.phone_label')}: {t('contact.phone_number')}
+                    📞 Saudi: 8001110110 (Toll-Free)
                   </a>
                 </p>
-                <p>Riyadh, Saudi Arabia</p>
+                <p>
+                  <a href="tel:+14424444410" className="hover:text-primary transition-colors">
+                    📞 US: +1 (442) 444-4410
+                  </a>
+                </p>
+                <p className="pt-2">🇸🇦 Riyadh, Saudi Arabia</p>
+                <p>🇺🇸 30 N Gould St, Ste R, Sheridan, WY 82801</p>
               </div>
             </div>
           </div>
           <div className="border-t border-black/10 pt-8 text-center">
-            <p className="text-muted-foreground text-sm">&copy; 2024 Falcon Core Holdings. {t('footer.rights')}</p>
+            <p className="text-muted-foreground text-sm">&copy; 2024 Falcon Core LLC. {t('footer.rights')}</p>
           </div>
         </div>
       </footer>

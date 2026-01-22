@@ -218,7 +218,7 @@ const Index = () => {
             >
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary font-medium">
                 <Building2 className="w-4 h-4" />
-                <span>Falcon Core Holdings</span>
+                <span>Falcon Core LLC</span>
               </div>
               <h2 className="text-3xl md:text-5xl font-bold">{t('about.title')}</h2>
               <p className="text-lg text-muted-foreground leading-relaxed">

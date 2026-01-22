@@ -238,7 +238,7 @@ export const AdminDashboard = () => {
               admin@fc.sa
             </a>
           </p>
-          <p className="mt-2">© 2024 Falcon Core Holdings. All rights reserved.</p>
+          <p className="mt-2">© 2024 Falcon Core LLC. All rights reserved.</p>
         </motion.div>
       </div>
     </AdminLayout>
