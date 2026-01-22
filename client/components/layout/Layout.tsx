@@ -156,13 +156,13 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
             <div>
               <h4 className="font-bold mb-4">{t('footer.contact_info')}</h4>
               <div className="space-y-2 text-sm text-muted-foreground">
-                <p>Email: info@falconcore.us</p>
+                <p>Email: info@fc.sa</p>
                 <p>
-                  <a href="tel:800111011" className="hover:text-primary transition-colors font-semibold text-primary">
+                  <a href="tel:8001110110" className="hover:text-primary transition-colors font-semibold text-primary">
                     📞 {t('contact.phone_label')}: {t('contact.phone_number')}
                   </a>
                 </p>
-                <p>Saudi Arabia</p>
+                <p>Riyadh, Saudi Arabia</p>
               </div>
             </div>
           </div>

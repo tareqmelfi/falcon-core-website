@@ -163,8 +163,8 @@ const About = () => {
           <div className="max-w-4xl mx-auto">
             <div className="space-y-8">
               {[
-                { company: t('about.speakbros'), desc: t('about.speakbros_desc'), icon: Building2 },
-                { company: t('about.fivecolors'), desc: t('about.fivecolors_desc'), icon: LineChart },
+                { company: t('about.phase1'), desc: t('about.phase1_desc'), icon: Building2 },
+                { company: t('about.phase2'), desc: t('about.phase2_desc'), icon: LineChart },
                 { company: t('about.falcon_core'), desc: t('about.falcon_core_desc'), icon: Rocket }
               ].map((milestone, index) => {
                 const Icon = milestone.icon;

@@ -85,7 +85,7 @@ export const AdminDashboard = () => {
         >
           <div className="flex items-start justify-between">
             <div>
-              <h1 className="text-3xl md:text-4xl font-bold mb-2">Welcome back, Tareq! 👋</h1>
+              <h1 className="text-3xl md:text-4xl font-bold mb-2">Welcome back! 👋</h1>
               <p className="text-muted-foreground">
                 Here's what's happening with your website today.
               </p>
@@ -234,8 +234,8 @@ export const AdminDashboard = () => {
         >
           <p>
             Welcome to Falcon Core Admin Dashboard. For support, contact{' '}
-            <a href="mailto:tareq@falconcore.us" className="text-primary hover:underline">
-              tareq@falconcore.us
+            <a href="mailto:admin@fc.sa" className="text-primary hover:underline">
+              admin@fc.sa
             </a>
           </p>
           <p className="mt-2">© 2024 Falcon Core Holdings. All rights reserved.</p>

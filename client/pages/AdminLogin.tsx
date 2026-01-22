@@ -110,8 +110,8 @@ export const AdminLogin = () => {
         <div className="mt-8 text-center">
           <p className="text-muted-foreground text-sm">
             Need help? Contact{' '}
-            <a href="mailto:tareq@falconcore.us" className="text-primary hover:underline">
-              tareq@falconcore.us
+            <a href="mailto:admin@fc.sa" className="text-primary hover:underline">
+              admin@fc.sa
             </a>
           </p>
         </div>

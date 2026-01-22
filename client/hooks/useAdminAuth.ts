@@ -7,7 +7,7 @@ interface AdminSession {
 }
 
 const ADMIN_PASSWORD = 'Fc8787965@!';
-const ADMIN_EMAIL = 'tareq@fc.sa';
+const ADMIN_EMAIL = 'admin@fc.sa';
 const SESSION_TIMEOUT = 8 * 60 * 60 * 1000; // 8 hours
 const STORAGE_KEY = 'admin_session';
 

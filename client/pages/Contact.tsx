@@ -28,7 +28,7 @@ const Contact = () => {
     {
       icon: Mail,
       label: t('contact.email'),
-      value: "info@falconcore.us"
+      value: "info@fc.sa"
     },
     {
       icon: Phone,
