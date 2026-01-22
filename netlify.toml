@@ -21,6 +21,13 @@
   status = 200
   force = true
 
+# Contact form endpoint
+[[redirects]]
+  from = "/api/contact"
+  to = "/.netlify/functions/contact"
+  status = 200
+  force = true
+
 # General API catch-all
 [[redirects]]
   force = true
