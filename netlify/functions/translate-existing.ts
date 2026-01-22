@@ -4,8 +4,10 @@ import { Handler } from '@netlify/functions';
 const BUILDER_PRIVATE_KEY = process.env.BUILDER_PRIVATE_KEY || 'bpk-5abb7d3d3b494a5fa7f4b34e3db52f87';
 const BUILDER_PUBLIC_KEY = process.env.VITE_BUILDER_PUBLIC_KEY || '4a2cb5bf56834399b5a569ae235d6a41';
 
-// Claude API configuration (for translation)
-const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
+// OpenRouter API configuration (for translation)
+// Free models: meta-llama/llama-3.2-3b-instruct:free, google/gemma-2-9b-it:free
+const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
+const OPENROUTER_MODEL = process.env.OPENROUTER_MODEL || 'google/gemma-2-9b-it:free';
 
 interface ArticleData {
   title: string;
@@ -19,28 +21,38 @@ interface ArticleData {
   date?: string;
 }
 
-// Function to translate text using Claude API
-async function translateWithClaude(text: string, targetLang: 'ar' | 'en'): Promise<string> {
-  if (!ANTHROPIC_API_KEY) {
-    throw new Error('ANTHROPIC_API_KEY not configured. Please set it in Netlify environment variables.');
+// Function to translate text using OpenRouter API
+async function translateText(text: string, targetLang: 'ar' | 'en'): Promise<string> {
+  if (!OPENROUTER_API_KEY) {
+    throw new Error('OPENROUTER_API_KEY not configured. Please set it in Netlify environment variables.');
+  }
+
+  // Skip empty text
+  if (!text || text.trim() === '') {
+    return text;
   }
 
   const langName = targetLang === 'ar' ? 'Arabic' : 'English';
 
-  const response = await fetch('https://api.anthropic.com/v1/messages', {
+  const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'x-api-key': ANTHROPIC_API_KEY,
-      'anthropic-version': '2023-06-01'
+      'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+      'HTTP-Referer': 'https://falconcore.us',
+      'X-Title': 'Falcon Core Article Translator'
     },
     body: JSON.stringify({
-      model: 'claude-3-haiku-20240307',
+      model: OPENROUTER_MODEL,
       max_tokens: 8192,
       messages: [
         {
+          role: 'system',
+          content: `You are a professional translator. Translate the given text to ${langName}. Maintain all HTML formatting, links, and structure exactly as they are. Only return the translated text, nothing else. Do not add any explanations or notes.`
+        },
+        {
           role: 'user',
-          content: `Translate the following text to ${langName}. Maintain all HTML formatting, links, and structure. Only return the translated text, nothing else:\n\n${text}`
+          content: text
         }
       ]
     })
@@ -48,11 +60,11 @@ async function translateWithClaude(text: string, targetLang: 'ar' | 'en'): Promi
 
   if (!response.ok) {
     const errorText = await response.text();
-    throw new Error(`Claude API error: ${response.status} - ${errorText}`);
+    throw new Error(`OpenRouter API error: ${response.status} - ${errorText}`);
   }
 
   const data = await response.json();
-  return data.content[0].text;
+  return data.choices[0]?.message?.content || text;
 }
 
 // Fetch all articles from Builder.io
@@ -174,19 +186,20 @@ export const handler: Handler = async (event) => {
             title: a.data?.title,
             slug: a.data?.slug
           })),
-          anthropicKeyConfigured: !!ANTHROPIC_API_KEY
+          openRouterKeyConfigured: !!OPENROUTER_API_KEY,
+          model: OPENROUTER_MODEL
         })
       };
     }
 
     // POST request - perform translations
-    if (!ANTHROPIC_API_KEY) {
+    if (!OPENROUTER_API_KEY) {
       return {
         statusCode: 400,
         headers,
         body: JSON.stringify({
-          error: 'ANTHROPIC_API_KEY not configured',
-          message: 'Please set ANTHROPIC_API_KEY in Netlify environment variables to enable translations'
+          error: 'OPENROUTER_API_KEY not configured',
+          message: 'Please set OPENROUTER_API_KEY in Netlify environment variables to enable translations. Get your key from https://openrouter.ai/keys'
         })
       };
     }
@@ -205,10 +218,10 @@ export const handler: Handler = async (event) => {
           translatedContent,
           translatedCategory
         ] = await Promise.all([
-          translateWithClaude(data.title, 'ar'),
-          translateWithClaude(data.excerpt || '', 'ar'),
-          translateWithClaude(data.content || '', 'ar'),
-          translateWithClaude(data.category || '', 'ar')
+          translateText(data.title, 'ar'),
+          translateText(data.excerpt || '', 'ar'),
+          translateText(data.content || '', 'ar'),
+          translateText(data.category || '', 'ar')
         ]);
 
         const arabicSlug = 'fc.sa/' + normalizeSlug(data.slug) + '-ar';
@@ -259,10 +272,10 @@ export const handler: Handler = async (event) => {
           translatedContent,
           translatedCategory
         ] = await Promise.all([
-          translateWithClaude(data.title, 'en'),
-          translateWithClaude(data.excerpt || '', 'en'),
-          translateWithClaude(data.content || '', 'en'),
-          translateWithClaude(data.category || '', 'en')
+          translateText(data.title, 'en'),
+          translateText(data.excerpt || '', 'en'),
+          translateText(data.content || '', 'en'),
+          translateText(data.category || '', 'en')
         ]);
 
         const englishSlug = 'fc.sa/' + normalizeSlug(data.slug).replace(/-ar$/, '');
