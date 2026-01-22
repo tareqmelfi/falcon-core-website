@@ -58,7 +58,7 @@ async function translateWithClaude(text: string, targetLang: 'ar' | 'en'): Promi
 // Fetch all articles from Builder.io
 async function fetchArticles(): Promise<any[]> {
   const response = await fetch(
-    `https://cdn.builder.io/api/v2/content/article?apiKey=${BUILDER_PUBLIC_KEY}&limit=100&fields=id,name,data`
+    `https://cdn.builder.io/api/v3/content/article?apiKey=${BUILDER_PUBLIC_KEY}&limit=100`
   );
 
   if (!response.ok) {
