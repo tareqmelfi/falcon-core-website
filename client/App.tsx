@@ -26,6 +26,7 @@ import ThankYou from "./pages/ThankYou";
 import OrderIntake from "./pages/OrderIntake";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
+import QuoteCalculator from "./pages/QuoteCalculator";
 import BuilderPage from "./components/BuilderPage";
 import NotFound from "./pages/NotFound";
 
@@ -57,6 +58,10 @@ const App = () => (
             <Route path="/thank-you-formation" element={<ThankYou />} />
             <Route path="/thank-you-website" element={<ThankYou />} />
             <Route path="/order-intake" element={<OrderIntake />} />
+
+            {/* Quote Calculator */}
+            <Route path="/quote" element={<QuoteCalculator />} />
+            <Route path="/calculator" element={<QuoteCalculator />} />
 
             {/* Legal Pages */}
             <Route path="/terms" element={<Terms />} />

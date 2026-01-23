@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useLanguage } from '@/lib/i18n';
 import { Button } from '@/components/ui/button';
-import { Globe, Menu } from 'lucide-react';
+import { Globe, Menu, Calculator } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import AnimatedBackground from '@/components/ui/AnimatedBackground';
 import { resetMetaTags } from '@/lib/meta-manager';
@@ -47,6 +47,10 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
       </Link>
       <Link to="/store" className="text-foreground/80 hover:text-primary transition-colors font-medium">
         {t('nav.store')}
+      </Link>
+      <Link to="/quote" className="text-foreground/80 hover:text-primary transition-colors font-medium flex items-center gap-1">
+        <Calculator className="w-4 h-4" />
+        {t('nav.calculator')}
       </Link>
       <Link to="/articles" className="text-foreground/80 hover:text-primary transition-colors font-medium">
         {t('nav.articles')}

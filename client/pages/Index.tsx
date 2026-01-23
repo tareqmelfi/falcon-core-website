@@ -22,7 +22,9 @@ import {
   ChevronRight,
   Star,
   ShoppingBag,
-  Check
+  Check,
+  Calculator,
+  Zap
 } from 'lucide-react';
 
 const container = {
@@ -117,8 +119,12 @@ const Index = () => {
             <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
               {t('hero.subtitle')}
             </p>
-            <div className="flex justify-end pt-8">
-              <Button size="lg" onClick={() => navigate('/services')} className="text-lg px-8 h-14 rounded-full bg-primary hover:bg-primary/90 shadow-[0_0_30px_-10px_rgba(59,130,246,0.6)] transition-all duration-300 hover:scale-105">
+            <div className="flex flex-col sm:flex-row justify-center gap-4 pt-8">
+              <Button size="lg" onClick={() => navigate('/quote')} className="text-lg px-8 h-14 rounded-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 shadow-[0_0_30px_-10px_rgba(34,197,94,0.6)] transition-all duration-300 hover:scale-105">
+                <Calculator className="w-5 h-5 mr-2" />
+                {t('nav.calculator')}
+              </Button>
+              <Button size="lg" variant="outline" onClick={() => navigate('/services')} className="text-lg px-8 h-14 rounded-full border-2 hover:bg-primary/10 transition-all duration-300 hover:scale-105">
                 {t('hero.cta_secondary')} <ArrowRight className={`ml-2 w-5 h-5 ${dir === 'rtl' ? 'rotate-180' : ''}`} />
               </Button>
             </div>
