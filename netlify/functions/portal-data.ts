@@ -1,7 +1,32 @@
 import type { Handler, HandlerEvent, HandlerContext } from "@netlify/functions";
 
-// In production, this would be connected to your database (e.g., Supabase, MongoDB, etc.)
-// Orders would be created when Stripe webhook receives checkout.session.completed
+/**
+ * Portal Data API - Customer Order Management
+ *
+ * Database Integration:
+ * - Production: Airtable (set AIRTABLE_API_KEY and AIRTABLE_BASE_ID)
+ * - Development: Returns empty orders (no demo data)
+ *
+ * Endpoints:
+ * - GET /orders?email=xxx - Get customer's orders with pipeline status
+ * - GET /order/:id?email=xxx - Get specific order details
+ * - POST /message - Send message to support
+ *
+ * Orders are created when:
+ * 1. Stripe webhook receives checkout.session.completed
+ * 2. Admin manually creates order in Airtable dashboard
+ *
+ * Airtable Tables Required:
+ * - Orders: OrderId, Email, Product, ProductCode, Status, Progress, Date, Amount, CustomerName
+ * - OrderSteps: OrderId, Name, NameAr, Status, Date, StepOrder
+ * - Documents: OrderId, Name, Size, Date, URL
+ * - Messages: OrderId, Email, From, Message, Date, IsTeam
+ */
+
+// Airtable Configuration
+const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY;
+const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID;
+const AIRTABLE_API_URL = 'https://api.airtable.com/v0';
 
 interface Order {
   id: string;
@@ -33,34 +58,136 @@ interface Order {
   }[];
 }
 
-// Mock database - In production, replace with real database queries
-// Orders are keyed by email for quick lookup
-const ordersDB: Map<string, Order[]> = new Map();
+/**
+ * Check if Airtable is configured
+ */
+function isAirtableConfigured(): boolean {
+  return !!(AIRTABLE_API_KEY && AIRTABLE_BASE_ID);
+}
 
-// Initialize with empty - orders will come from Stripe webhooks
-// Example of how an order would look when created:
-/*
-ordersDB.set('customer@example.com', [{
-  id: 'ORD-2026-001',
-  email: 'customer@example.com',
-  product: 'US LLC Formation Package',
-  productCode: 'FC-FORM-001',
-  status: 'in_progress',
-  progress: 60,
-  date: '2026-01-20',
-  amount: 1200,
-  customerName: 'John Doe',
-  steps: [
-    { name: 'Order Received', nameAr: 'تم استلام الطلب', status: 'completed', date: '2026-01-20' },
-    { name: 'Intake Form Completed', nameAr: 'تم اكتمال نموذج المعلومات', status: 'completed', date: '2026-01-21' },
-    { name: 'Articles Filed with Wyoming', nameAr: 'تم تقديم المستندات لوايومنغ', status: 'completed', date: '2026-01-22' },
-    { name: 'EIN Application', nameAr: 'طلب الرقم الضريبي', status: 'in_progress', date: null },
-    { name: 'Documents Delivered', nameAr: 'تسليم المستندات', status: 'pending', date: null },
-  ],
-  documents: [],
-  messages: []
-}]);
-*/
+/**
+ * Make Airtable API request
+ */
+async function airtableRequest(endpoint: string, method = 'GET', body?: any): Promise<any> {
+  const url = `${AIRTABLE_API_URL}/${AIRTABLE_BASE_ID}/${endpoint}`;
+  const response = await fetch(url, {
+    method,
+    headers: {
+      'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
+      'Content-Type': 'application/json',
+    },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Airtable API error: ${response.status} - ${errorText}`);
+  }
+
+  return response.json();
+}
+
+/**
+ * Fetch orders from Airtable for a customer email
+ */
+async function fetchOrdersFromAirtable(email: string): Promise<Order[]> {
+  const filterFormula = `LOWER({Email}) = '${email.toLowerCase()}'`;
+  const ordersResponse = await airtableRequest(
+    `Orders?filterByFormula=${encodeURIComponent(filterFormula)}&sort[0][field]=Date&sort[0][direction]=desc`
+  );
+
+  const orders: Order[] = [];
+
+  for (const record of ordersResponse.records || []) {
+    const orderId = record.fields.OrderId || record.id;
+
+    // Fetch steps for this order
+    let steps: Order['steps'] = [];
+    try {
+      const stepsFilter = `{OrderId} = '${orderId}'`;
+      const stepsResponse = await airtableRequest(
+        `OrderSteps?filterByFormula=${encodeURIComponent(stepsFilter)}&sort[0][field]=StepOrder&sort[0][direction]=asc`
+      );
+      steps = (stepsResponse.records || []).map((s: any) => ({
+        name: s.fields.Name,
+        nameAr: s.fields.NameAr,
+        status: s.fields.Status || 'pending',
+        date: s.fields.Date || null,
+      }));
+    } catch (e) {
+      console.log('OrderSteps table not found or empty');
+    }
+
+    // Fetch documents for this order
+    let documents: Order['documents'] = [];
+    try {
+      const docsFilter = `{OrderId} = '${orderId}'`;
+      const docsResponse = await airtableRequest(
+        `Documents?filterByFormula=${encodeURIComponent(docsFilter)}`
+      );
+      documents = (docsResponse.records || []).map((d: any) => ({
+        name: d.fields.Name,
+        size: d.fields.Size || '',
+        date: d.fields.Date,
+        url: d.fields.URL,
+      }));
+    } catch (e) {
+      console.log('Documents table not found or empty');
+    }
+
+    // Fetch messages for this order
+    let messages: Order['messages'] = [];
+    try {
+      const msgsFilter = `{OrderId} = '${orderId}'`;
+      const msgsResponse = await airtableRequest(
+        `Messages?filterByFormula=${encodeURIComponent(msgsFilter)}&sort[0][field]=Date&sort[0][direction]=asc`
+      );
+      messages = (msgsResponse.records || []).map((m: any) => ({
+        from: m.fields.From,
+        message: m.fields.Message,
+        date: m.fields.Date,
+        isTeam: m.fields.IsTeam || false,
+      }));
+    } catch (e) {
+      console.log('Messages table not found or empty');
+    }
+
+    orders.push({
+      id: orderId,
+      email: record.fields.Email,
+      product: record.fields.Product,
+      productCode: record.fields.ProductCode || '',
+      status: record.fields.Status || 'pending',
+      progress: record.fields.Progress || 0,
+      date: record.fields.Date,
+      amount: record.fields.Amount || 0,
+      customerName: record.fields.CustomerName,
+      steps,
+      documents,
+      messages,
+    });
+  }
+
+  return orders;
+}
+
+/**
+ * Save message to Airtable
+ */
+async function saveMessageToAirtable(email: string, orderId: string | undefined, message: string): Promise<void> {
+  await airtableRequest('Messages', 'POST', {
+    records: [{
+      fields: {
+        OrderId: orderId || '',
+        Email: email,
+        From: email,
+        Message: message,
+        Date: new Date().toISOString(),
+        IsTeam: false,
+      }
+    }]
+  });
+}
 
 const handler: Handler = async (event: HandlerEvent, context: HandlerContext) => {
   const headers = {
@@ -88,13 +215,12 @@ const handler: Handler = async (event: HandlerEvent, context: HandlerContext) =>
   const sessionToken = authHeader.replace('Bearer ', '');
 
   // In production: Validate session token against your auth system
-  // For now, we'll trust the token and extract email from request
-  // This should be verified against the token store in portal-auth.ts
+  // TODO: Verify session token validity against stored sessions
 
   const path = event.path.replace('/.netlify/functions/portal-data', '');
 
   try {
-    // GET /orders - Get customer's orders
+    // GET /orders - Get customer's orders with full pipeline data
     if (event.httpMethod === "GET" && path === '/orders') {
       const email = event.queryStringParameters?.email;
 
@@ -106,8 +232,20 @@ const handler: Handler = async (event: HandlerEvent, context: HandlerContext) =>
         };
       }
 
-      // Get orders for this customer
-      const customerOrders = ordersDB.get(email.toLowerCase()) || [];
+      let customerOrders: Order[] = [];
+
+      // Fetch from Airtable if configured
+      if (isAirtableConfigured()) {
+        try {
+          customerOrders = await fetchOrdersFromAirtable(email);
+          console.log(`Fetched ${customerOrders.length} orders from Airtable for ${email}`);
+        } catch (error) {
+          console.error('Airtable fetch error:', error);
+          // Continue with empty orders rather than failing
+        }
+      } else {
+        console.log('Airtable not configured. Set AIRTABLE_API_KEY and AIRTABLE_BASE_ID environment variables.');
+      }
 
       // Calculate stats
       const stats = {
@@ -122,7 +260,12 @@ const handler: Handler = async (event: HandlerEvent, context: HandlerContext) =>
         body: JSON.stringify({
           success: true,
           orders: customerOrders,
-          stats
+          stats,
+          // Helpful message for debugging
+          debug: {
+            airtableConfigured: isAirtableConfigured(),
+            orderCount: customerOrders.length,
+          }
         })
       };
     }
@@ -140,8 +283,16 @@ const handler: Handler = async (event: HandlerEvent, context: HandlerContext) =>
         };
       }
 
-      const customerOrders = ordersDB.get(email.toLowerCase()) || [];
-      const order = customerOrders.find(o => o.id === orderId);
+      let order: Order | undefined;
+
+      if (isAirtableConfigured()) {
+        try {
+          const customerOrders = await fetchOrdersFromAirtable(email);
+          order = customerOrders.find(o => o.id === orderId);
+        } catch (error) {
+          console.error('Airtable fetch error:', error);
+        }
+      }
 
       if (!order) {
         return {
@@ -174,12 +325,23 @@ const handler: Handler = async (event: HandlerEvent, context: HandlerContext) =>
         };
       }
 
-      // In production: Save message to database and notify support team
       console.log('New support message from:', email);
       console.log('Order ID:', orderId);
       console.log('Message:', message);
 
+      // Save to Airtable if configured
+      if (isAirtableConfigured()) {
+        try {
+          await saveMessageToAirtable(email, orderId, message);
+          console.log('Message saved to Airtable');
+        } catch (error) {
+          console.error('Failed to save message to Airtable:', error);
+          // Don't fail the request, just log the error
+        }
+      }
+
       // TODO: Send notification to support team via email/Slack
+      // Consider using SendGrid, Mailgun, or Slack webhook
 
       return {
         statusCode: 200,
