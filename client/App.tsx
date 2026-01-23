@@ -19,6 +19,9 @@ import WorkWithUs from "./pages/WorkWithUs";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminMonitoring from "./pages/AdminMonitoring";
+import Store from "./pages/Store";
+import Portal from "./pages/Portal";
+import ThankYou from "./pages/ThankYou";
 import BuilderPage from "./components/BuilderPage";
 import NotFound from "./pages/NotFound";
 
@@ -41,6 +44,14 @@ const App = () => (
             <Route path="/articles" element={<Articles />} />
             <Route path="/articles/:slug" element={<ArticleDetail />} />
             <Route path="/brand-identity" element={<BrandIdentity />} />
+
+            {/* Store & Portal Routes */}
+            <Route path="/store" element={<Store />} />
+            <Route path="/portal" element={<Portal />} />
+            <Route path="/thank-you" element={<ThankYou />} />
+            <Route path="/thank-you-advisory" element={<ThankYou />} />
+            <Route path="/thank-you-formation" element={<ThankYou />} />
+            <Route path="/thank-you-website" element={<ThankYou />} />
 
             {/* Admin Routes */}
             <Route path="/admin/login" element={<AdminLogin />} />

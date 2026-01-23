@@ -45,6 +45,9 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
       <Link to="/work-with-us" className="text-foreground/80 hover:text-primary transition-colors font-medium">
         {t('nav.work_with_us')}
       </Link>
+      <Link to="/store" className="text-foreground/80 hover:text-primary transition-colors font-medium">
+        {t('nav.store')}
+      </Link>
       <Link to="/articles" className="text-foreground/80 hover:text-primary transition-colors font-medium">
         {t('nav.articles')}
       </Link>

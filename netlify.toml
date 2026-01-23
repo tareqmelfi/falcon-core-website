@@ -28,6 +28,13 @@
   status = 200
   force = true
 
+# Stripe webhook endpoint
+[[redirects]]
+  from = "/stripe-webhook"
+  to = "/.netlify/functions/stripe-webhook"
+  status = 200
+  force = true
+
 # General API catch-all
 [[redirects]]
   force = true
