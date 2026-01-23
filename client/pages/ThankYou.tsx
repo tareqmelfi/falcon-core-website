@@ -182,6 +182,30 @@ const ThankYou = () => {
             </p>
           </motion.div>
 
+          {/* Important: Complete Your Information */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.9 }}
+            className="bg-gradient-to-r from-primary/10 to-blue-500/10 border border-primary/20 rounded-xl p-6 mb-8"
+          >
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center">
+                <FileText className="w-5 h-5 text-primary" />
+              </div>
+              <div className="text-left">
+                <h3 className="font-semibold">{t('thankyou.complete_info_title')}</h3>
+                <p className="text-sm text-muted-foreground">{t('thankyou.complete_info_desc')}</p>
+              </div>
+            </div>
+            <Button asChild size="lg" className="w-full bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90">
+              <Link to={`/order-intake?order=${orderId}&product=${product === 'advisory' ? 'FC-ADV-001' : product === 'formation' ? 'FC-FORM-001' : 'FC-WEB-001'}`}>
+                {t('thankyou.complete_info_button')}
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Link>
+            </Button>
+          </motion.div>
+
           {/* Action Buttons */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -189,13 +213,13 @@ const ThankYou = () => {
             transition={{ delay: 1 }}
             className="flex flex-col sm:flex-row gap-4 justify-center"
           >
-            <Button asChild size="lg">
+            <Button asChild size="lg" variant="outline">
               <Link to="/portal">
                 {t('thankyou.go_to_portal')}
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Link>
             </Button>
-            <Button asChild variant="outline" size="lg">
+            <Button asChild variant="ghost" size="lg">
               <Link to="/">
                 {t('thankyou.back_home')}
               </Link>

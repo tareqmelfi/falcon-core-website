@@ -1,0 +1,305 @@
+{
+  "name": "Falcon Core - Order Automation Workflow",
+  "description": "Automated order processing workflow for Falcon Core digital products",
+  "version": "1.0.0",
+  "workflows": [
+    {
+      "id": "stripe-payment-received",
+      "name": "1. Stripe Payment Received",
+      "trigger": "Stripe Webhook - checkout.session.completed",
+      "nodes": [
+        {
+          "id": "1",
+          "type": "n8n-nodes-base.webhook",
+          "name": "Stripe Webhook",
+          "parameters": {
+            "httpMethod": "POST",
+            "path": "stripe-webhook",
+            "responseMode": "onReceived"
+          }
+        },
+        {
+          "id": "2",
+          "type": "n8n-nodes-base.set",
+          "name": "Extract Payment Data",
+          "parameters": {
+            "values": {
+              "string": [
+                { "name": "customer_email", "value": "={{ $json.data.object.customer_details.email }}" },
+                { "name": "customer_name", "value": "={{ $json.data.object.customer_details.name }}" },
+                { "name": "payment_id", "value": "={{ $json.data.object.payment_intent }}" },
+                { "name": "amount", "value": "={{ $json.data.object.amount_total / 100 }}" },
+                { "name": "product_code", "value": "={{ $json.data.object.metadata.product_code }}" }
+              ]
+            }
+          }
+        },
+        {
+          "id": "3",
+          "type": "n8n-nodes-base.airtable",
+          "name": "Create Order Record",
+          "parameters": {
+            "operation": "create",
+            "application": "{{ AIRTABLE_BASE_ID }}",
+            "table": "Orders",
+            "fields": {
+              "Order ID": "=ORD-{{ $now.format('YYYY') }}-{{ $randomString(3).toUpperCase() }}",
+              "Customer Name": "={{ $json.customer_name }}",
+              "Customer Email": "={{ $json.customer_email }}",
+              "Product Code": "={{ $json.product_code }}",
+              "Amount": "={{ $json.amount }}",
+              "Status": "New",
+              "Payment ID": "={{ $json.payment_id }}",
+              "Created At": "={{ $now.toISO() }}"
+            }
+          }
+        },
+        {
+          "id": "4",
+          "type": "n8n-nodes-base.httpRequest",
+          "name": "Send Welcome Email (Resend)",
+          "parameters": {
+            "method": "POST",
+            "url": "https://api.resend.com/emails",
+            "authentication": "headerAuth",
+            "headerAuth": {
+              "name": "Authorization",
+              "value": "Bearer {{ RESEND_API_KEY }}"
+            },
+            "body": {
+              "from": "Falcon Core <orders@fc.sa>",
+              "to": "={{ $json.customer_email }}",
+              "subject": "Order Confirmed - {{ $json.order_id }}",
+              "html": "<h1>Thank you for your order!</h1><p>Order ID: {{ $json.order_id }}</p><p>Please complete your information: <a href='https://fc.sa/order-intake?order={{ $json.order_id }}&product={{ $json.product_code }}'>Click Here</a></p>"
+            }
+          }
+        },
+        {
+          "id": "5",
+          "type": "n8n-nodes-base.slack",
+          "name": "Notify Team (Slack)",
+          "parameters": {
+            "channel": "#orders",
+            "text": "🎉 New Order!\n*Order ID:* {{ $json.order_id }}\n*Customer:* {{ $json.customer_name }}\n*Product:* {{ $json.product_code }}\n*Amount:* ${{ $json.amount }}"
+          }
+        }
+      ]
+    },
+    {
+      "id": "customer-data-submitted",
+      "name": "2. Customer Data Submitted",
+      "trigger": "Webhook - /order-intake",
+      "nodes": [
+        {
+          "id": "1",
+          "type": "n8n-nodes-base.webhook",
+          "name": "Intake Form Webhook",
+          "parameters": {
+            "httpMethod": "POST",
+            "path": "order-intake",
+            "responseMode": "onReceived"
+          }
+        },
+        {
+          "id": "2",
+          "type": "n8n-nodes-base.airtable",
+          "name": "Update Order with Data",
+          "parameters": {
+            "operation": "update",
+            "application": "{{ AIRTABLE_BASE_ID }}",
+            "table": "Orders",
+            "recordId": "={{ $json.orderId }}",
+            "fields": {
+              "Status": "Data Received",
+              "Form Data": "={{ JSON.stringify($json.formData) }}",
+              "Data Submitted At": "={{ $now.toISO() }}"
+            }
+          }
+        },
+        {
+          "id": "3",
+          "type": "n8n-nodes-base.httpRequest",
+          "name": "Send Confirmation Email",
+          "parameters": {
+            "method": "POST",
+            "url": "https://api.resend.com/emails",
+            "body": {
+              "from": "Falcon Core <orders@fc.sa>",
+              "to": "={{ $json.formData.email }}",
+              "subject": "Information Received - Order {{ $json.orderId }}",
+              "html": "<h1>We received your information!</h1><p>Our team will start working on your order shortly.</p><p>Track your order: <a href='https://fc.sa/portal'>Customer Portal</a></p>"
+            }
+          }
+        },
+        {
+          "id": "4",
+          "type": "n8n-nodes-base.slack",
+          "name": "Notify Team",
+          "parameters": {
+            "channel": "#orders",
+            "text": "📋 Customer Data Received!\n*Order ID:* {{ $json.orderId }}\n*Customer:* {{ $json.formData.fullName }}\nReady for processing."
+          }
+        }
+      ]
+    },
+    {
+      "id": "status-update",
+      "name": "3. Order Status Update",
+      "trigger": "Airtable Record Updated",
+      "nodes": [
+        {
+          "id": "1",
+          "type": "n8n-nodes-base.airtableTrigger",
+          "name": "Airtable Status Change",
+          "parameters": {
+            "application": "{{ AIRTABLE_BASE_ID }}",
+            "table": "Orders",
+            "triggerField": "Status"
+          }
+        },
+        {
+          "id": "2",
+          "type": "n8n-nodes-base.switch",
+          "name": "Route by Status",
+          "parameters": {
+            "rules": [
+              { "value1": "={{ $json.fields.Status }}", "value2": "In Progress" },
+              { "value1": "={{ $json.fields.Status }}", "value2": "Completed" },
+              { "value1": "={{ $json.fields.Status }}", "value2": "Cancelled" }
+            ]
+          }
+        },
+        {
+          "id": "3",
+          "type": "n8n-nodes-base.httpRequest",
+          "name": "Send Status Email",
+          "parameters": {
+            "method": "POST",
+            "url": "https://api.resend.com/emails",
+            "body": {
+              "from": "Falcon Core <orders@fc.sa>",
+              "to": "={{ $json.fields['Customer Email'] }}",
+              "subject": "Order Update - {{ $json.fields['Order ID'] }}",
+              "html": "<h1>Order Status Update</h1><p>Your order status has been updated to: <strong>{{ $json.fields.Status }}</strong></p><p>Track your order: <a href='https://fc.sa/portal'>Customer Portal</a></p>"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "llc-formation-workflow",
+      "name": "4. LLC Formation Specific Workflow",
+      "trigger": "New LLC Formation Order",
+      "nodes": [
+        {
+          "id": "1",
+          "type": "n8n-nodes-base.airtableTrigger",
+          "name": "LLC Order Ready",
+          "parameters": {
+            "application": "{{ AIRTABLE_BASE_ID }}",
+            "table": "Orders",
+            "filterByFormula": "AND({Product Code}='FC-FORM-001', {Status}='Data Received')"
+          }
+        },
+        {
+          "id": "2",
+          "type": "n8n-nodes-base.set",
+          "name": "Extract Company Names",
+          "parameters": {
+            "values": {
+              "string": [
+                { "name": "company_name_1", "value": "={{ JSON.parse($json.fields['Form Data']).companyName1 }}" },
+                { "name": "company_name_2", "value": "={{ JSON.parse($json.fields['Form Data']).companyName2 }}" },
+                { "name": "company_name_3", "value": "={{ JSON.parse($json.fields['Form Data']).companyName3 }}" }
+              ]
+            }
+          }
+        },
+        {
+          "id": "3",
+          "type": "n8n-nodes-base.airtable",
+          "name": "Create LLC Task",
+          "parameters": {
+            "operation": "create",
+            "application": "{{ AIRTABLE_BASE_ID }}",
+            "table": "LLC Tasks",
+            "fields": {
+              "Order ID": "={{ $json.order_id }}",
+              "Company Name Options": "={{ $json.company_name_1 }}, {{ $json.company_name_2 }}, {{ $json.company_name_3 }}",
+              "Task": "Name Availability Check",
+              "Status": "Pending",
+              "Due Date": "={{ $now.plus({days: 1}).toISO() }}"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "environment_variables": [
+    {
+      "name": "AIRTABLE_BASE_ID",
+      "description": "Airtable Base ID for storing orders"
+    },
+    {
+      "name": "AIRTABLE_API_KEY",
+      "description": "Airtable API key"
+    },
+    {
+      "name": "RESEND_API_KEY",
+      "description": "Resend API key for sending emails"
+    },
+    {
+      "name": "SLACK_WEBHOOK_URL",
+      "description": "Slack webhook URL for notifications"
+    },
+    {
+      "name": "N8N_WEBHOOK_BASE_URL",
+      "description": "Base URL for n8n webhooks (e.g., https://n8n.yourserver.com)"
+    }
+  ],
+  "airtable_schema": {
+    "base_name": "Falcon Core Orders",
+    "tables": [
+      {
+        "name": "Orders",
+        "fields": [
+          { "name": "Order ID", "type": "singleLineText", "primary": true },
+          { "name": "Customer Name", "type": "singleLineText" },
+          { "name": "Customer Email", "type": "email" },
+          { "name": "Customer Phone", "type": "phoneNumber" },
+          { "name": "Product Code", "type": "singleSelect", "options": ["FC-ADV-001", "FC-FORM-001", "FC-WEB-001"] },
+          { "name": "Amount", "type": "currency" },
+          { "name": "Status", "type": "singleSelect", "options": ["New", "Data Received", "In Progress", "Review", "Completed", "Cancelled"] },
+          { "name": "Payment ID", "type": "singleLineText" },
+          { "name": "Form Data", "type": "longText" },
+          { "name": "Notes", "type": "longText" },
+          { "name": "Created At", "type": "dateTime" },
+          { "name": "Data Submitted At", "type": "dateTime" },
+          { "name": "Completed At", "type": "dateTime" }
+        ]
+      },
+      {
+        "name": "LLC Tasks",
+        "fields": [
+          { "name": "Task ID", "type": "autoNumber", "primary": true },
+          { "name": "Order ID", "type": "singleLineText" },
+          { "name": "Task", "type": "singleLineText" },
+          { "name": "Company Name Options", "type": "longText" },
+          { "name": "Status", "type": "singleSelect", "options": ["Pending", "In Progress", "Completed", "Blocked"] },
+          { "name": "Due Date", "type": "date" },
+          { "name": "Notes", "type": "longText" }
+        ]
+      }
+    ]
+  },
+  "setup_instructions": {
+    "step_1": "Set up Airtable base using the schema above",
+    "step_2": "Configure Resend account and verify domain fc.sa",
+    "step_3": "Set up Slack workspace and create #orders channel",
+    "step_4": "Import workflows into n8n self-hosted instance",
+    "step_5": "Configure environment variables in n8n",
+    "step_6": "Set up Stripe webhook to point to n8n webhook URL",
+    "step_7": "Update Netlify function to call n8n webhook",
+    "step_8": "Test end-to-end workflow with test payment"
+  }
+}

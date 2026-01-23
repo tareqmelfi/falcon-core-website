@@ -126,7 +126,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
 
       <footer className="border-t border-black/10 bg-background/50 backdrop-blur-sm py-8 mt-auto">
         <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-3 gap-8 mb-8">
+          <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
               <img
                 src="https://cdn.builder.io/api/v1/image/assets%2Fcaddb27a75ac426ab2cf2b1bb67636ef%2F2e1b9087ef4e46cdb32b82db285f3f9e?format=webp&width=800"
@@ -154,6 +154,20 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                 <Link to="/brand-identity" className="text-muted-foreground hover:text-primary text-sm transition-colors">
                   {t('nav.brand_identity')}
                 </Link>
+                <Link to="/portal" className="text-muted-foreground hover:text-primary text-sm transition-colors">
+                  {language === 'ar' ? 'بوابة العملاء' : 'Customer Portal'}
+                </Link>
+              </nav>
+            </div>
+            <div>
+              <h4 className="font-bold mb-4">{language === 'ar' ? 'قانوني' : 'Legal'}</h4>
+              <nav className="flex flex-col gap-2">
+                <Link to="/terms" className="text-muted-foreground hover:text-primary text-sm transition-colors">
+                  {language === 'ar' ? 'الشروط والأحكام' : 'Terms & Conditions'}
+                </Link>
+                <Link to="/privacy" className="text-muted-foreground hover:text-primary text-sm transition-colors">
+                  {language === 'ar' ? 'سياسة الخصوصية' : 'Privacy Policy'}
+                </Link>
               </nav>
             </div>
             <div>
@@ -175,8 +189,16 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
               </div>
             </div>
           </div>
-          <div className="border-t border-black/10 pt-8 text-center">
-            <p className="text-muted-foreground text-sm">&copy; 2024 Falcon Core LLC. {t('footer.rights')}</p>
+          <div className="border-t border-black/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+            <p className="text-muted-foreground text-sm">&copy; 2026 Falcon Core LLC. {t('footer.rights')}</p>
+            <div className="flex gap-4 text-sm">
+              <Link to="/terms" className="text-muted-foreground hover:text-primary transition-colors">
+                {language === 'ar' ? 'الشروط' : 'Terms'}
+              </Link>
+              <Link to="/privacy" className="text-muted-foreground hover:text-primary transition-colors">
+                {language === 'ar' ? 'الخصوصية' : 'Privacy'}
+              </Link>
+            </div>
           </div>
         </div>
       </footer>

@@ -383,6 +383,9 @@ export const translations: Record<Language, Record<string, string>> = {
     "thankyou.website.step2_desc": "Submit your logo, brand colors, and website content.",
     "thankyou.website.step3_title": "Review & Launch",
     "thankyou.website.step3_desc": "Your website goes live in 14 business days!",
+    "thankyou.complete_info_title": "Important: Complete Your Information",
+    "thankyou.complete_info_desc": "Please provide the required details so we can start working on your order.",
+    "thankyou.complete_info_button": "Complete My Information",
   },
   ar: {
     "lang": "ar",
@@ -754,7 +757,10 @@ export const translations: Record<Language, Record<string, string>> = {
     "thankyou.website.step2_title": "قدم المحتوى",
     "thankyou.website.step2_desc": "أرسل شعارك وألوان علامتك ومحتوى الموقع.",
     "thankyou.website.step3_title": "مراجعة وإطلاق",
-    "thankyou.website.step3_desc": "موقعك سيكون جاهزاً في 14 يوم عمل!"
+    "thankyou.website.step3_desc": "موقعك سيكون جاهزاً في 14 يوم عمل!",
+    "thankyou.complete_info_title": "مهم: أكمل معلوماتك",
+    "thankyou.complete_info_desc": "يرجى تقديم التفاصيل المطلوبة حتى نتمكن من البدء في طلبك.",
+    "thankyou.complete_info_button": "إكمال بياناتي"
   }
 };
 

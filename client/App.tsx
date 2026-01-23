@@ -19,9 +19,13 @@ import WorkWithUs from "./pages/WorkWithUs";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminMonitoring from "./pages/AdminMonitoring";
+import AdminOrders from "./pages/AdminOrders";
 import Store from "./pages/Store";
 import Portal from "./pages/Portal";
 import ThankYou from "./pages/ThankYou";
+import OrderIntake from "./pages/OrderIntake";
+import Terms from "./pages/Terms";
+import Privacy from "./pages/Privacy";
 import BuilderPage from "./components/BuilderPage";
 import NotFound from "./pages/NotFound";
 
@@ -52,11 +56,17 @@ const App = () => (
             <Route path="/thank-you-advisory" element={<ThankYou />} />
             <Route path="/thank-you-formation" element={<ThankYou />} />
             <Route path="/thank-you-website" element={<ThankYou />} />
+            <Route path="/order-intake" element={<OrderIntake />} />
+
+            {/* Legal Pages */}
+            <Route path="/terms" element={<Terms />} />
+            <Route path="/privacy" element={<Privacy />} />
 
             {/* Admin Routes */}
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/admin/monitoring" element={<AdminMonitoring />} />
+            <Route path="/admin/orders" element={<AdminOrders />} />
 
             {/*
               Builder.io Visual CMS Routes

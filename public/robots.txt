@@ -12,3 +12,11 @@ Allow: /
 
 User-agent: *
 Allow: /
+
+# Sitemap
+Sitemap: https://fc.sa/sitemap.xml
+
+# Disallow admin and sensitive paths
+Disallow: /admin
+Disallow: /admin/*
+Disallow: /api/*
