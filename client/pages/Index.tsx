@@ -15,7 +15,14 @@ import {
   Workflow,
   ArrowRight,
   Building2,
-  Rocket
+  Rocket,
+  MessageSquare,
+  Code,
+  ChevronLeft,
+  ChevronRight,
+  Star,
+  ShoppingBag,
+  Check
 } from 'lucide-react';
 
 const container = {
@@ -32,6 +39,35 @@ const item = {
   hidden: { opacity: 0, y: 20 },
   show: { opacity: 1, y: 0 }
 };
+
+// Products data for carousel
+const storeProducts = [
+  {
+    id: 'advisory',
+    price: 250,
+    icon: MessageSquare,
+    color: 'from-blue-500 to-cyan-500',
+    features: 3,
+    stripeLink: 'https://buy.stripe.com/28EbJ2eqm86N9G8dg9f3a00',
+  },
+  {
+    id: 'formation',
+    price: 1200,
+    icon: Building2,
+    color: 'from-emerald-500 to-teal-500',
+    popular: true,
+    features: 6,
+    stripeLink: 'https://buy.stripe.com/6oU28s5TQgDj9G87VPf3a01',
+  },
+  {
+    id: 'website',
+    price: 3500,
+    icon: Code,
+    color: 'from-purple-500 to-pink-500',
+    features: 5,
+    stripeLink: 'https://buy.stripe.com/14A3cwfuq3Qx19Cgslf3a02',
+  },
+];
 
 const Index = () => {
   const { t, dir } = useLanguage();
@@ -276,39 +312,95 @@ const Index = () => {
         </div>
       </section>
 
-      {/* AI Trading Section */}
+      {/* Featured Products Section */}
       <section className="py-24 relative overflow-hidden">
-        <div className="absolute inset-0 bg-primary/5" />
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent" />
         <div className="container mx-auto px-4 relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="max-w-3xl mx-auto text-center space-y-8"
+            className="text-center mb-12"
           >
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/20 text-primary mb-4">
-              <Cpu className="w-8 h-8" />
+              <ShoppingBag className="w-8 h-8" />
             </div>
-            <h2 className="text-3xl md:text-5xl font-bold">{t('trading.title')}</h2>
-            <p className="text-xl text-muted-foreground">
-              {t('trading.desc')}
+            <h2 className="text-3xl md:text-5xl font-bold mb-4">{t('store.featured_title')}</h2>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              {t('store.featured_subtitle')}
             </p>
-            <div className="h-64 w-full bg-gradient-to-r from-transparent via-primary/20 to-transparent rounded-xl border border-white/10 backdrop-blur-md flex items-center justify-center">
-              <div className="text-center">
-                <p className="text-sm text-muted-foreground mb-2">Live Market Analysis</p>
-                <div className="flex items-end gap-1 h-20 justify-center">
-                  {[40, 60, 45, 70, 50, 80, 65, 90, 75, 60].map((h, i) => (
-                    <motion.div
-                      key={i}
-                      initial={{ height: 0 }}
-                      whileInView={{ height: `${h}%` }}
-                      transition={{ duration: 0.5, delay: i * 0.1 }}
-                      className="w-2 bg-primary rounded-t-sm"
-                    />
-                  ))}
-                </div>
-              </div>
-            </div>
+          </motion.div>
+
+          {/* Products Grid */}
+          <motion.div
+            variants={container}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true }}
+            className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto"
+          >
+            {storeProducts.map((product, index) => {
+              const IconComponent = product.icon;
+              return (
+                <motion.div key={product.id} variants={item} className="relative">
+                  {product.popular && (
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
+                      <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-gradient-to-r from-orange-500 to-red-500 text-white text-xs font-medium">
+                        <Star className="w-3 h-3" />
+                        {t('store.popular')}
+                      </span>
+                    </div>
+                  )}
+                  <Card className={`h-full bg-card/50 backdrop-blur-sm border-white/10 hover:border-primary/50 transition-all duration-300 hover:-translate-y-2 ${product.popular ? 'border-2 border-primary shadow-xl shadow-primary/20' : ''}`}>
+                    <CardHeader className="text-center pb-2">
+                      <div className={`w-14 h-14 mx-auto rounded-xl bg-gradient-to-br ${product.color} p-3 mb-3`}>
+                        <IconComponent className="w-full h-full text-white" />
+                      </div>
+                      <CardTitle className="text-lg">
+                        {t(`store.${product.id}.title`)}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="text-center pb-4">
+                      <div className="mb-4">
+                        <span className="text-3xl font-bold">${product.price.toLocaleString()}</span>
+                        <span className="text-muted-foreground text-sm ml-1">USD</span>
+                      </div>
+                      <p className="text-sm text-muted-foreground mb-4">
+                        {t(`store.${product.id}.subtitle`)}
+                      </p>
+                      <Button
+                        asChild
+                        className={`w-full ${product.popular ? 'bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90' : ''}`}
+                        size="sm"
+                      >
+                        <a href={product.stripeLink} target="_blank" rel="noopener noreferrer">
+                          {t('store.buy_now')}
+                          <ArrowRight className={`w-4 h-4 ${dir === 'rtl' ? 'mr-2 rotate-180' : 'ml-2'}`} />
+                        </a>
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              );
+            })}
+          </motion.div>
+
+          {/* View All Products Button */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mt-10"
+          >
+            <Button
+              variant="outline"
+              size="lg"
+              onClick={() => navigate('/store')}
+              className="rounded-full px-8"
+            >
+              {t('store.view_all')}
+              <ArrowRight className={`w-4 h-4 ${dir === 'rtl' ? 'mr-2 rotate-180' : 'ml-2'}`} />
+            </Button>
           </motion.div>
         </div>
       </section>
