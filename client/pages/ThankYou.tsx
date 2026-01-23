@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSearchParams, Link } from 'react-router-dom';
 import { useLanguage } from '@/lib/i18n';
+import Layout from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import {
@@ -57,6 +58,7 @@ const ThankYou = () => {
   }, []);
 
   return (
+    <Layout>
     <div className="min-h-screen py-20 relative overflow-hidden">
       {/* Celebration Sparkles */}
       <AnimatePresence>
@@ -222,6 +224,7 @@ const ThankYou = () => {
         </motion.div>
       </div>
     </div>
+    </Layout>
   );
 };
 

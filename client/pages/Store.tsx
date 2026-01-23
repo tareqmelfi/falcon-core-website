@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useLanguage } from '@/lib/i18n';
+import Layout from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -24,7 +25,7 @@ const products = [
       'store.advisory.feature4',
       'store.advisory.feature5',
     ],
-    stripeLink: 'https://buy.stripe.com/test_advisory', // Replace with actual Stripe link
+    stripeLink: 'https://buy.stripe.com/28EbJ2eqm86N9G8dg9f3a00',
   },
   {
     id: 'formation',
@@ -42,7 +43,7 @@ const products = [
       'store.formation.feature5',
       'store.formation.feature6',
     ],
-    stripeLink: 'https://buy.stripe.com/test_formation', // Replace with actual Stripe link
+    stripeLink: 'https://buy.stripe.com/6oU28s5TQgDj9G87VPf3a01',
   },
   {
     id: 'website',
@@ -60,7 +61,7 @@ const products = [
       'store.website.feature5',
       'store.website.feature6',
     ],
-    stripeLink: 'https://buy.stripe.com/test_website', // Replace with actual Stripe link
+    stripeLink: 'https://buy.stripe.com/14A3cwfuq3Qx19Cgslf3a02',
   },
 ];
 
@@ -68,6 +69,7 @@ const Store = () => {
   const { t, language } = useLanguage();
 
   return (
+    <Layout>
     <div className="min-h-screen">
       {/* Hero Section */}
       <section className="relative py-20 overflow-hidden">
@@ -237,6 +239,7 @@ const Store = () => {
         </div>
       </section>
     </div>
+    </Layout>
   );
 };
 

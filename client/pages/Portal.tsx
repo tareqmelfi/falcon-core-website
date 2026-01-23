@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useLanguage } from '@/lib/i18n';
+import Layout from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -62,6 +63,7 @@ const Portal = () => {
   // Login/Lookup Screen
   if (!isLoggedIn) {
     return (
+      <Layout>
       <div className="min-h-screen py-20">
         <div className="container mx-auto px-4">
           <motion.div
@@ -172,11 +174,13 @@ const Portal = () => {
           </motion.div>
         </div>
       </div>
+      </Layout>
     );
   }
 
   // Dashboard Screen
   return (
+    <Layout>
     <div className="min-h-screen py-12">
       <div className="container mx-auto px-4">
         <motion.div
@@ -428,6 +432,7 @@ const Portal = () => {
         </motion.div>
       </div>
     </div>
+    </Layout>
   );
 };
 
