@@ -3,12 +3,16 @@ import { motion } from 'framer-motion';
 import { useLanguage } from '@/lib/i18n';
 import Layout from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Check, Clock, Globe, Shield, Zap, Building2, Code, MessageSquare, ArrowRight, Star, MapPin, FileText } from 'lucide-react';
+import {
+  Check, Clock, Globe, Shield, Zap, Building2, Code, MessageSquare,
+  ArrowRight, Star, MapPin, Workflow, Cloud, Megaphone, Bot,
+  ShoppingCart, Calculator, Sparkles
+} from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 
-// Product data - All services including Wyoming LLC
+// Products - All go to detail pages (no direct purchase)
 const products = [
   {
     id: 'advisory',
@@ -25,8 +29,7 @@ const products = [
       'store.advisory.feature4',
       'store.advisory.feature5',
     ],
-    stripeLink: 'https://buy.stripe.com/28EbJ2eqm86N9G8dg9f3a00',
-    type: 'stripe', // Direct Stripe purchase
+    link: '/store/advisory',
   },
   {
     id: 'wyoming',
@@ -46,7 +49,6 @@ const products = [
       'store.wyoming.feature5',
     ],
     link: '/store/wyoming-llc',
-    type: 'internal', // Goes to detailed product page
     badge: 'Wyoming LLC',
   },
   {
@@ -65,20 +67,78 @@ const products = [
       'store.website.feature5',
       'store.website.feature6',
     ],
-    stripeLink: 'https://buy.stripe.com/14A3cwfuq3Qx19Cgslf3a02',
-    type: 'stripe',
+    link: '/store/website-package',
+  },
+];
+
+// Services that can be productized
+const services = [
+  {
+    id: 'automation',
+    icon: Workflow,
+    color: 'from-orange-500 to-amber-500',
+    priceFrom: 1500,
+    link: '/store/services/automation',
+  },
+  {
+    id: 'ai_agents',
+    icon: Bot,
+    color: 'from-violet-500 to-purple-500',
+    priceFrom: 2000,
+    link: '/store/services/ai-agents',
+  },
+  {
+    id: 'marketing',
+    icon: Megaphone,
+    color: 'from-pink-500 to-rose-500',
+    priceFrom: 800,
+    link: '/store/services/marketing',
+  },
+  {
+    id: 'cloud',
+    icon: Cloud,
+    color: 'from-sky-500 to-blue-500',
+    priceFrom: 500,
+    link: '/store/services/cloud',
+  },
+  {
+    id: 'ecommerce',
+    icon: ShoppingCart,
+    color: 'from-green-500 to-emerald-500',
+    priceFrom: 3000,
+    link: '/store/services/ecommerce',
+  },
+  {
+    id: 'rapid_product_dev',
+    icon: Zap,
+    color: 'from-yellow-500 to-orange-500',
+    priceFrom: 5000,
+    link: '/store/services/rapid-dev',
   },
 ];
 
 const Store = () => {
-  const { t, language } = useLanguage();
+  const { t, language, dir } = useLanguage();
   const navigate = useNavigate();
+
+  const container = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: { staggerChildren: 0.1 }
+    }
+  };
+
+  const item = {
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0 }
+  };
 
   return (
     <Layout>
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative py-20 overflow-hidden">
+      <section className="relative py-16 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-purple-500/10" />
         <div className="container mx-auto px-4 relative z-10">
           <motion.div
@@ -90,10 +150,10 @@ const Store = () => {
               <Zap className="w-3 h-3 mr-1" />
               {t('store.badge')}
             </Badge>
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">
               {t('store.title')}
             </h1>
-            <p className="text-xl text-muted-foreground mb-8">
+            <p className="text-lg text-muted-foreground mb-6">
               {t('store.subtitle')}
             </p>
             <div className="flex flex-wrap justify-center gap-4">
@@ -115,18 +175,37 @@ const Store = () => {
       </section>
 
       {/* Products Section */}
-      <section className="py-16">
+      <section className="py-12">
         <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
-            {products.map((product, index) => {
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-10"
+          >
+            <h2 className="text-2xl md:text-3xl font-bold mb-2">
+              {language === 'ar' ? 'المنتجات الجاهزة' : 'Ready-to-Buy Products'}
+            </h2>
+            <p className="text-muted-foreground">
+              {language === 'ar' ? 'خدمات محددة بأسعار واضحة' : 'Fixed-price solutions with clear deliverables'}
+            </p>
+          </motion.div>
+
+          <motion.div
+            variants={container}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true }}
+            className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto"
+          >
+            {products.map((product) => {
               const IconComponent = product.icon;
               return (
                 <motion.div
                   key={product.id}
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  className="relative"
+                  variants={item}
+                  className="relative cursor-pointer group"
+                  onClick={() => navigate(product.link)}
                 >
                   {product.popular && (
                     <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
@@ -136,7 +215,7 @@ const Store = () => {
                       </Badge>
                     </div>
                   )}
-                  <Card className={`h-full flex flex-col ${product.popular ? 'border-2 border-primary shadow-xl shadow-primary/20' : 'border-border/50'}`}>
+                  <Card className={`h-full flex flex-col transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-xl ${product.popular ? 'border-2 border-primary shadow-lg shadow-primary/20' : 'border-border/50 group-hover:border-primary/50'}`}>
                     <CardHeader className="text-center pb-4">
                       {product.badge && (
                         <Badge variant="outline" className="w-fit mx-auto mb-2 border-emerald-500/50 text-emerald-500">
@@ -144,10 +223,10 @@ const Store = () => {
                           {product.badge}
                         </Badge>
                       )}
-                      <div className={`w-14 h-14 mx-auto rounded-2xl bg-gradient-to-br ${product.color} p-3 mb-3`}>
+                      <div className={`w-14 h-14 mx-auto rounded-2xl bg-gradient-to-br ${product.color} p-3 mb-3 group-hover:scale-110 transition-transform`}>
                         <IconComponent className="w-full h-full text-white" />
                       </div>
-                      <CardTitle className="text-lg">
+                      <CardTitle className="text-lg group-hover:text-primary transition-colors">
                         {t(`store.${product.id}.title`)}
                       </CardTitle>
                       <CardDescription className="text-xs">
@@ -175,47 +254,179 @@ const Store = () => {
 
                       {/* Features */}
                       <ul className="space-y-2">
-                        {product.features.map((feature, i) => (
+                        {product.features.slice(0, 4).map((feature, i) => (
                           <li key={i} className="flex items-start gap-2">
                             <Check className="w-4 h-4 text-green-500 shrink-0 mt-0.5" />
                             <span className="text-xs">{t(feature)}</span>
                           </li>
                         ))}
+                        {product.features.length > 4 && (
+                          <li className="text-xs text-primary font-medium">
+                            +{product.features.length - 4} {language === 'ar' ? 'المزيد' : 'more'}
+                          </li>
+                        )}
                       </ul>
                     </CardContent>
-                    <CardFooter className="pt-4">
-                      {product.type === 'stripe' ? (
-                        <Button
-                          asChild
-                          className={`w-full ${product.popular ? 'bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90' : ''}`}
-                        >
-                          <a href={product.stripeLink} target="_blank" rel="noopener noreferrer">
-                            {t('store.buy_now')}
-                            <ArrowRight className="w-4 h-4 ml-2" />
-                          </a>
-                        </Button>
-                      ) : (
-                        <Button
-                          className={`w-full ${product.popular ? 'bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700' : ''}`}
-                          onClick={() => navigate(product.link!)}
-                        >
-                          {language === 'ar' ? 'عرض التفاصيل' : 'View Details'}
-                          <ArrowRight className="w-4 h-4 ml-2" />
-                        </Button>
-                      )}
-                    </CardFooter>
+                    <div className="p-4 pt-0">
+                      <Button
+                        className={`w-full ${product.popular ? 'bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700' : ''}`}
+                      >
+                        {t('store.view_details')}
+                        <ArrowRight className={`w-4 h-4 ${dir === 'rtl' ? 'mr-2 rotate-180' : 'ml-2'}`} />
+                      </Button>
+                    </div>
                   </Card>
                 </motion.div>
               );
             })}
-          </div>
+          </motion.div>
         </div>
       </section>
 
-      {/* Trust Section */}
-      <section className="py-16 bg-card/50">
+      {/* Services Section */}
+      <section className="py-12 bg-card/30">
         <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-10"
+          >
+            <Badge variant="outline" className="mb-4">
+              <Sparkles className="w-3 h-3 mr-1" />
+              {language === 'ar' ? 'خدمات متخصصة' : 'Professional Services'}
+            </Badge>
+            <h2 className="text-2xl md:text-3xl font-bold mb-2">
+              {language === 'ar' ? 'خدمات الأعمال' : 'Business Services'}
+            </h2>
+            <p className="text-muted-foreground">
+              {language === 'ar' ? 'حلول مخصصة لاحتياجات عملك' : 'Custom solutions tailored to your needs'}
+            </p>
+          </motion.div>
+
+          <motion.div
+            variants={container}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true }}
+            className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 max-w-5xl mx-auto"
+          >
+            {services.map((service) => {
+              const IconComponent = service.icon;
+              return (
+                <motion.div
+                  key={service.id}
+                  variants={item}
+                  className="cursor-pointer group"
+                  onClick={() => navigate(service.link)}
+                >
+                  <Card className="h-full text-center p-4 transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-lg group-hover:border-primary/50">
+                    <div className={`w-12 h-12 mx-auto rounded-xl bg-gradient-to-br ${service.color} p-2.5 mb-3 group-hover:scale-110 transition-transform`}>
+                      <IconComponent className="w-full h-full text-white" />
+                    </div>
+                    <h3 className="font-semibold text-sm mb-1 group-hover:text-primary transition-colors">
+                      {t(`services.${service.id}`)}
+                    </h3>
+                    <p className="text-xs text-muted-foreground">
+                      {language === 'ar' ? 'من' : 'from'} ${service.priceFrom.toLocaleString()}
+                    </p>
+                  </Card>
+                </motion.div>
+              );
+            })}
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mt-8"
+          >
+            <Button variant="outline" asChild>
+              <Link to="/services">
+                {language === 'ar' ? 'عرض جميع الخدمات' : 'View All Services'}
+                <ArrowRight className={`w-4 h-4 ${dir === 'rtl' ? 'mr-2 rotate-180' : 'ml-2'}`} />
+              </Link>
+            </Button>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Quote Calculator Section */}
+      <section className="py-12">
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <Card className="max-w-3xl mx-auto overflow-hidden">
+              <div className="grid md:grid-cols-2">
+                <div className="p-8 bg-gradient-to-br from-primary/10 to-blue-500/10">
+                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-blue-600 p-4 mb-4">
+                    <Calculator className="w-full h-full text-white" />
+                  </div>
+                  <h2 className="text-2xl font-bold mb-2">
+                    {language === 'ar' ? 'حاسبة التكاليف' : 'Cost Calculator'}
+                  </h2>
+                  <p className="text-muted-foreground text-sm mb-4">
+                    {language === 'ar'
+                      ? 'احسب تكاليف تأسيس شركتك في أمريكا بناءً على احتياجاتك'
+                      : 'Estimate your US business formation costs based on your specific needs'}
+                  </p>
+                  <ul className="space-y-2 text-sm">
+                    <li className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-green-500" />
+                      {language === 'ar' ? 'تقدير فوري للتكاليف' : 'Instant cost estimate'}
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-green-500" />
+                      {language === 'ar' ? 'مقارنة الولايات' : 'State comparison'}
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-green-500" />
+                      {language === 'ar' ? 'خيارات مخصصة' : 'Custom options'}
+                    </li>
+                  </ul>
+                </div>
+                <div className="p-8 flex flex-col justify-center">
+                  <h3 className="font-semibold mb-2">
+                    {language === 'ar' ? 'لست متأكداً مما تحتاج؟' : 'Not sure what you need?'}
+                  </h3>
+                  <p className="text-sm text-muted-foreground mb-6">
+                    {language === 'ar'
+                      ? 'استخدم حاسبتنا للحصول على تقدير مخصص أو تواصل مع فريقنا'
+                      : 'Use our calculator for a custom estimate or talk to our team'}
+                  </p>
+                  <div className="space-y-3">
+                    <Button className="w-full" asChild>
+                      <Link to="/quote">
+                        <Calculator className="w-4 h-4 mr-2" />
+                        {language === 'ar' ? 'احسب التكلفة' : 'Calculate Cost'}
+                      </Link>
+                    </Button>
+                    <Button variant="outline" className="w-full" asChild>
+                      <Link to="/contact">
+                        {language === 'ar' ? 'تحدث مع خبير' : 'Talk to an Expert'}
+                      </Link>
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </Card>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Trust/Guarantee Section */}
+      <section className="py-12 bg-card/50">
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="max-w-4xl mx-auto text-center"
+          >
             <h2 className="text-2xl font-bold mb-8">{t('store.guarantee.title')}</h2>
             <div className="grid md:grid-cols-3 gap-8">
               <div className="p-6">
@@ -234,12 +445,12 @@ const Store = () => {
                 <p className="text-sm text-muted-foreground">{t('store.guarantee.satisfaction_desc')}</p>
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* Questions CTA */}
-      <section className="py-16">
+      <section className="py-12">
         <div className="container mx-auto px-4">
           <Card className="max-w-2xl mx-auto text-center p-8">
             <h2 className="text-2xl font-bold mb-4">{t('store.questions.title')}</h2>
@@ -247,7 +458,7 @@ const Store = () => {
             <Button asChild variant="outline" size="lg">
               <Link to="/contact">
                 {t('store.questions.contact')}
-                <ArrowRight className="w-4 h-4 ml-2" />
+                <ArrowRight className={`w-4 h-4 ${dir === 'rtl' ? 'mr-2 rotate-180' : 'ml-2'}`} />
               </Link>
             </Button>
           </Card>
@@ -266,7 +477,7 @@ const Store = () => {
               <Button asChild>
                 <Link to="/portal">
                   {t('store.portal.access')}
-                  <ArrowRight className="w-4 h-4 ml-2" />
+                  <ArrowRight className={`w-4 h-4 ${dir === 'rtl' ? 'mr-2 rotate-180' : 'ml-2'}`} />
                 </Link>
               </Button>
             </div>

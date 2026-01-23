@@ -31,6 +31,8 @@ import BuilderPage from "./components/BuilderPage";
 import NotFound from "./pages/NotFound";
 import WyomingLLC from "./pages/WyomingLLC";
 import WyomingBusinessGuide from "./pages/WyomingBusinessGuide";
+import AdvisorySession from "./pages/AdvisorySession";
+import WebsitePackage from "./pages/WebsitePackage";
 
 const queryClient = new QueryClient();
 
@@ -61,6 +63,8 @@ const App = () => (
             <Route path="/thank-you-website" element={<ThankYou />} />
             <Route path="/order-intake" element={<OrderIntake />} />
             <Route path="/store/wyoming-llc" element={<WyomingLLC />} />
+            <Route path="/store/advisory" element={<AdvisorySession />} />
+            <Route path="/store/website-package" element={<WebsitePackage />} />
             <Route path="/articles/wyoming-business-guide-2025" element={<WyomingBusinessGuide />} />
 
             {/* Quote Calculator */}

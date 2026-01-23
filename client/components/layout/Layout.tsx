@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useLanguage } from '@/lib/i18n';
 import { Button } from '@/components/ui/button';
-import { Globe, Menu, Calculator } from 'lucide-react';
+import { Globe, Menu } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import AnimatedBackground from '@/components/ui/AnimatedBackground';
 import { resetMetaTags } from '@/lib/meta-manager';
@@ -36,24 +36,14 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
       <Link to="/" className="text-foreground/80 hover:text-primary transition-colors font-medium">
         {t('nav.home')}
       </Link>
-      <Link to="/services" className="text-foreground/80 hover:text-primary transition-colors font-medium">
-        {t('nav.services')}
-      </Link>
-      <Link to="/about" className="text-foreground/80 hover:text-primary transition-colors font-medium">
-        {t('nav.about')}
-      </Link>
-      <Link to="/work-with-us" className="text-foreground/80 hover:text-primary transition-colors font-medium">
-        {t('nav.work_with_us')}
-      </Link>
       <Link to="/store" className="text-foreground/80 hover:text-primary transition-colors font-medium">
         {t('nav.store')}
       </Link>
-      <Link to="/quote" className="text-foreground/80 hover:text-primary transition-colors font-medium flex items-center gap-1">
-        <Calculator className="w-4 h-4" />
-        {t('nav.calculator')}
-      </Link>
       <Link to="/articles" className="text-foreground/80 hover:text-primary transition-colors font-medium">
         {t('nav.articles')}
+      </Link>
+      <Link to="/about" className="text-foreground/80 hover:text-primary transition-colors font-medium">
+        {t('nav.about')}
       </Link>
       <Link to="/contact" className="text-foreground/80 hover:text-primary transition-colors font-medium">
         {t('nav.contact')}

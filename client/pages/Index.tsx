@@ -42,7 +42,7 @@ const item = {
   show: { opacity: 1, y: 0 }
 };
 
-// Products data for carousel
+// Products data for carousel - All go to detail pages
 const storeProducts = [
   {
     id: 'advisory',
@@ -50,7 +50,8 @@ const storeProducts = [
     icon: MessageSquare,
     color: 'from-blue-500 to-cyan-500',
     features: 3,
-    stripeLink: 'https://buy.stripe.com/28EbJ2eqm86N9G8dg9f3a00',
+    link: '/store/advisory',
+    type: 'internal',
   },
   {
     id: 'wyoming',
@@ -69,7 +70,8 @@ const storeProducts = [
     icon: Code,
     color: 'from-purple-500 to-pink-500',
     features: 5,
-    stripeLink: 'https://buy.stripe.com/14A3cwfuq3Qx19Cgslf3a02',
+    link: '/store/website-package',
+    type: 'internal',
   },
 ];
 
