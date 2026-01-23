@@ -53,13 +53,15 @@ const storeProducts = [
     stripeLink: 'https://buy.stripe.com/28EbJ2eqm86N9G8dg9f3a00',
   },
   {
-    id: 'formation',
-    price: 1200,
+    id: 'wyoming',
+    price: 297,
+    priceNote: '+ $100 state fee',
     icon: Building2,
     color: 'from-emerald-500 to-teal-500',
     popular: true,
-    features: 6,
-    stripeLink: 'https://buy.stripe.com/6oU28s5TQgDj9G87VPf3a01',
+    features: 5,
+    link: '/store/wyoming-llc',
+    type: 'internal',
   },
   {
     id: 'website',
@@ -374,16 +376,27 @@ const Index = () => {
                       <p className="text-sm text-muted-foreground mb-4">
                         {t(`store.${product.id}.subtitle`)}
                       </p>
-                      <Button
-                        asChild
-                        className={`w-full ${product.popular ? 'bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90' : ''}`}
-                        size="sm"
-                      >
-                        <a href={product.stripeLink} target="_blank" rel="noopener noreferrer">
-                          {t('store.buy_now')}
+                      {product.type === 'internal' ? (
+                        <Button
+                          className={`w-full ${product.popular ? 'bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700' : ''}`}
+                          size="sm"
+                          onClick={() => navigate(product.link!)}
+                        >
+                          {t('store.view_details') || 'View Details'}
                           <ArrowRight className={`w-4 h-4 ${dir === 'rtl' ? 'mr-2 rotate-180' : 'ml-2'}`} />
-                        </a>
-                      </Button>
+                        </Button>
+                      ) : (
+                        <Button
+                          asChild
+                          className={`w-full ${product.popular ? 'bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90' : ''}`}
+                          size="sm"
+                        >
+                          <a href={product.stripeLink} target="_blank" rel="noopener noreferrer">
+                            {t('store.buy_now')}
+                            <ArrowRight className={`w-4 h-4 ${dir === 'rtl' ? 'mr-2 rotate-180' : 'ml-2'}`} />
+                          </a>
+                        </Button>
+                      )}
                     </CardContent>
                   </Card>
                 </motion.div>
