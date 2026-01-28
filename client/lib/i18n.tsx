@@ -500,6 +500,13 @@ export const translations: Record<Language, Record<string, string>> = {
     "store.faq.pricing.upgrade_later.a": "Yes! You can purchase add-on services anytime. For example, start with Basic and add EIN procurement or Registered Agent service later.",
     "store.faq.pricing.refunds.q": "What is your refund policy?",
     "store.faq.pricing.refunds.a": "If we haven't filed with the state yet, you're eligible for a full refund minus a $50 processing fee. Once filed, state fees are non-refundable but our service fee can be partially refunded based on work completed.",
+        "intake.feature.name_check": "Name Availability Check",
+        "intake.feature.digital_docs": "Digital Documents",
+        "intake.feature.custom_operating": "Custom Operating Agreement",
+        "intake.feature.registered_agent_1yr": "Registered Agent (1 Year)",
+        "intake.feature.articles": "Articles of Organization",
+        "intake.feature.basic_operating": "Basic Operating Agreement",
+        "store.addon.registered_agent": "Registered Agent Service",
   },
   ar: {
     "lang": "ar",
@@ -989,6 +996,13 @@ export const translations: Record<Language, Record<string, string>> = {
     "store.faq.pricing.upgrade_later.a": "نعم! يمكنك شراء خدمات إضافية في أي وقت. مثلاً، ابدأ بالأساسية وأضف خدمة EIN أو الوكيل المسجل لاحقاً.",
     "store.faq.pricing.refunds.q": "ما هي سياسة الاسترداد؟",
     "store.faq.pricing.refunds.a": "إذا لم نكن قد قدمنا للولاية بعد، تستحق استرداد كامل ناقص $50 رسوم معالجة. بعد التقديم، رسوم الولاية غير قابلة للاسترداد لكن رسوم خدمتنا يمكن استردادها جزئياً بناءً على العمل المنجز."
+        "intake.feature.name_check": "التحقق من اسم الشركة",
+      "intake.feature.digital_docs": "المستندات الرقمية",
+      "intake.feature.custom_operating": "اتفاقية تشغيل مخصصة",
+      "intake.feature.registered_agent_1yr": "وكيل مسجل لمدة سنة",
+      "intake.feature.articles": "عقد التأسيس",
+      "intake.feature.basic_operating": "اتفاقية تشغيل أساسية",
+      "store.addon.registered_agent": "خدمة الوكيل المسجل"
   }
 };
 
