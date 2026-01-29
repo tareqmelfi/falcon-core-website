@@ -466,6 +466,14 @@ export const translations: Record<Language, Record<string, string>> = {
     "store.addon.compliance_annual": "Annual Compliance Package",
     "store.addon.good_standing": "Certificate of Good Standing",
     "store.addon.apostille": "Apostille Service",
+    "store.addon.registered_agent": "Registered Agent Service",
+    // Intake Form Features
+    "intake.feature.name_check": "Name Availability Check",
+    "intake.feature.digital_docs": "Digital Documents",
+    "intake.feature.custom_operating": "Custom Operating Agreement",
+    "intake.feature.registered_agent_1yr": "Registered Agent (1 Year)",
+    "intake.feature.articles": "Articles of Organization",
+    "intake.feature.basic_operating": "Basic Operating Agreement",
     // FAQ - Formation
     "store.faq.formation.how_long.q": "How long does it take to form a Wyoming LLC?",
     "store.faq.formation.how_long.a": "Processing time depends on your package: Basic (10-15 days), Standard (5-7 days), Premium (1-3 days). These are business days after we receive your complete information.",
@@ -962,6 +970,14 @@ export const translations: Record<Language, Record<string, string>> = {
     "store.addon.compliance_annual": "باقة الالتزام السنوي",
     "store.addon.good_standing": "شهادة حسن السيرة",
     "store.addon.apostille": "خدمة الأبوستيل",
+    "store.addon.registered_agent": "خدمة الوكيل المسجل",
+    // Intake Form Features - Arabic
+    "intake.feature.name_check": "التحقق من اسم الشركة",
+    "intake.feature.digital_docs": "المستندات الرقمية",
+    "intake.feature.custom_operating": "اتفاقية تشغيل مخصصة",
+    "intake.feature.registered_agent_1yr": "وكيل مسجل لمدة سنة",
+    "intake.feature.articles": "عقد التأسيس",
+    "intake.feature.basic_operating": "اتفاقية تشغيل أساسية",
     // FAQ - Formation - Arabic
     "store.faq.formation.how_long.q": "كم يستغرق تأسيس شركة وايومنغ LLC؟",
     "store.faq.formation.how_long.a": "يعتمد وقت المعالجة على باقتك: الأساسية (10-15 يوم)، القياسية (5-7 أيام)، المميزة (1-3 أيام). هذه أيام عمل بعد استلام معلوماتك الكاملة.",
